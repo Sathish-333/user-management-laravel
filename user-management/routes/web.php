@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserManagementController;
 
+
 Route::get('/admin/users', [UserManagementController::class, 'index']);
 Route::get('/admin/users/create', [UserManagementController::class, 'create']);
 Route::post('/admin/users', [UserManagementController::class, 'store']);

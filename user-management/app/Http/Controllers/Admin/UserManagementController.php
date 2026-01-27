@@ -112,10 +112,8 @@ public function update(Request $request, $id)
 
     $user = User::findOrFail($id);
 
-    // Update user data
     $user->update($request->only('user_name', 'mobile', 'dob', 'gender'));
 
-    // Update home address
     $homeAddress = $user->addresses()->where('address_type', 'Home')->first();
     if ($homeAddress) {
         $homeAddress->update([
@@ -128,7 +126,6 @@ public function update(Request $request, $id)
         ]);
     }
 
-    // Update office address
     $officeAddress = $user->addresses()->where('address_type', 'Office')->first();
     if ($officeAddress) {
         $officeAddress->update([
@@ -147,10 +144,8 @@ public function destroy($id)
 {
     $user = User::findOrFail($id);
 
-    // Delete related addresses first (optional if your DB uses cascade delete)
     $user->addresses()->delete();
 
-    // Delete user
     $user->delete();
 
     return redirect('/admin/users')->with('success', 'User deleted successfully');
