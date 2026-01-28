@@ -29,30 +29,32 @@
                 placeholder="User Name"
                 oninput="validateName(this)"
                 value="{{ old('user_name', $user->user_name) }}"
+                maxlength="25"
                 required
             >
-            <small id="nameError" class="text-danger d-none">
-                Name should contain only letters
-            </small>
+            <small id="nameError" class="text-danger d-none"></small>
+
 
             <input
                 type="text"
                 name="mobile"
                 maxlength="10"
+                minlength="10"
                 class="form-control mb-2"
                 placeholder="Mobile"
                 oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                 value="{{ old('mobile', $user->mobile) }}"
                 required
             >
-
             <input
                 class="form-control mb-2"
                 type="date"
                 name="dob"
                 value="{{ old('dob', $user->dob) }}"
+                max="{{ date('Y-m-d') }}"
                 required
             >
+
 
             <select class="form-control mb-3" name="gender" required>
                 <option value="">Select Gender</option>
@@ -109,15 +111,49 @@
 </html>
 
 <script>
-function validateName(input) {
-    const regex = /^[A-Za-z\s]*$/;
-    const error = document.getElementById('nameError');
+document.addEventListener("DOMContentLoaded", function () {
 
-    if (!regex.test(input.value)) {
-        error.classList.remove('d-none');
-        input.value = input.value.replace(/[^A-Za-z\s]/g, '');
-    } else {
-        error.classList.add('d-none');
-    }
-}
+    window.validateName = function (input) {
+        const error = document.getElementById('nameError');
+        let value = input.value;
+
+        if (!/^[A-Za-z\s]*$/.test(value)) {
+            input.value = value.replace(/[^A-Za-z\s]/g, '');
+            error.innerText = "Name should contain only letters";
+            error.classList.remove('d-none');
+            return;
+        }
+
+        value = value.replace(/^\s+/, '');
+        input.value = value;
+
+        if (value.length < 3) {
+            error.innerText = "Name must be at least 3 characters";
+            error.classList.remove('d-none');
+        } else {
+            error.classList.add('d-none');
+        }
+    };
+
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function (e) {
+        const homeCity = document.querySelector('[name="home[city]"]').value.trim();
+        const officeCity = document.querySelector('[name="office[city]"]').value.trim();
+        const primaryAddress = document.querySelector('input[name="primary_address"]:checked');
+
+        if (!homeCity && !officeCity) {
+            e.preventDefault();
+            toastr.error("Please fill at least Home or Office address");
+            return;
+        }
+
+        if (!primaryAddress) {
+            e.preventDefault();
+            toastr.error("Please select Primary Address");
+            return;
+        }
+    });
+
+});
 </script>

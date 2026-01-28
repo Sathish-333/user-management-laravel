@@ -29,7 +29,7 @@
                 class="form-control mb-1"
                 placeholder="User Name"
                 oninput="validateName(this)"
-                required
+                required maxlength="25"
             >
 
             <small id="nameError" class="text-danger d-none">
@@ -40,21 +40,27 @@
                 type="text"
                 name="mobile"
                 maxlength="10"
+                minlength="10"
                 class="form-control mb-2"
                 placeholder="Mobile"
                 oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                 required
             >
 
+            <input
+                class="form-control mb-2"
+                type="date"
+                name="dob"
+                max="{{ date('Y-m-d') }}"
+                required
+            >
 
-            <input class="form-control mb-2"type="date" name="dob"required>
-
-
-            <select class="form-control mb-3" name="gender">
+            <select class="form-control mb-3" name="gender" required>
                 <option value="">Select Gender</option>
-                <option>Male</option>
-                <option>Female</option> 
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
             </select>
+
 
             <h6 class="mt-3">Home Address</h6>
             <input class="form-control mb-2" name="home[address_type]" value="Home" readonly>
@@ -99,16 +105,49 @@
 </html>
 
 <script>
-function validateName(input) {
-    const regex = /^[A-Za-z\s]*$/;
-    const error = document.getElementById('nameError');
+document.addEventListener("DOMContentLoaded", function () {
 
-    if (!regex.test(input.value)) {
-        error.classList.remove('d-none');
-        input.value = input.value.replace(/[^A-Za-z\s]/g, '');
-    } else {
-        error.classList.add('d-none');
-    }
-}
+    window.validateName = function (input) {
+        const error = document.getElementById('nameError');
+        let value = input.value;
+
+        if (!/^[A-Za-z\s]*$/.test(value)) {
+            input.value = value.replace(/[^A-Za-z\s]/g, '');
+            error.innerText = "Name should contain only letters";
+            error.classList.remove('d-none');
+            return;
+        }
+
+        value = value.replace(/^\s+/, '');
+        input.value = value;
+
+        if (value.length < 3) {
+            error.innerText = "Name must be at least 3 characters";
+            error.classList.remove('d-none');
+        } else {
+            error.classList.add('d-none');
+        }
+    };
+
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function (e) {
+        const homeCity = document.querySelector('[name="home[city]"]').value.trim();
+        const officeCity = document.querySelector('[name="office[city]"]').value.trim();
+        const primaryAddress = document.querySelector('input[name="primary_address"]:checked');
+
+        if (!homeCity && !officeCity) {
+            e.preventDefault();
+            toastr.error("Please fill at least Home or Office address");
+            return;
+        }
+
+        if (!primaryAddress) {
+            e.preventDefault();
+            toastr.error("Please select Primary Address");
+            return;
+        }
+    });
+
+});
 </script>
-

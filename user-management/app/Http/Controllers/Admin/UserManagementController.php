@@ -82,7 +82,7 @@ public function edit($id)
 public function update(Request $request, $id)
 {
     $request->validate([
-        'user_name' => ['required','regex:/^[a-zA-Z\s]+$/'],
+        'user_name' => ['required','min:3','max:25','regex:/^[a-zA-Z\s]+$/'],
         'mobile' => ['required','digits:10'],
         'dob' => ['required','date'],
         'gender' => 'required|in:Male,Female',
